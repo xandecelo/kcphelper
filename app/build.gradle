@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+}
+
+repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        mavenLocal()}
+
+dependencies {
+    
+    compileOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
+
+    // Log4J2 logging
+    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    //implementation 'org.apache.logging.log4j:log4j-jcl:2.20.0'
+    //implementation 'commons-logging:commons-logging:1.2'
+
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-arc'
+    implementation 'io.quarkus:quarkus-resteasy-reactive'
+    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
+    implementation("org.jboss.logmanager:log4j2-jboss-logmanager")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+group 'kcphelper'
+version '0.1.0-alpha'
