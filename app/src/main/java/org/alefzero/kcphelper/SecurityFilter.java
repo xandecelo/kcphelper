@@ -5,36 +5,52 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.ext.Provider;
 
-@WebFilter(urlPatterns = "/private")
-public class SecurityFilter implements Filter {
-
+@Provider
+@BearerRequired
+public class SecurityFilter implements ContainerRequestFilter {
     protected static final Logger logger = LogManager.getLogger();
+    private static final String NOT_AUTHORIZED = "Not authorized.";
+    private boolean environmentConfigured = false;
+
+    public SecurityFilter() {
+        this.environmentConfigured = checkEnvironment();
+    }
+
+    private boolean checkEnvironment() {
+        boolean result = true;
+        for (EnviromentConfig env : EnviromentConfig.values()) {
+            if (System.getenv(env.toString()) == null) {
+                logger.error("FATAL: Variable {} is not set.", env);
+                result = false;
+            }
+        }
+        return result;
+    }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-
-        logger.info("Filter.");
-
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String auth = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        if (auth == null || !(auth.equals("Bearer 12345678"))) {
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
-            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
-            logger.info("Blocked.");
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        if (environmentConfigured) {
+            String bearerCodeFromOS = EnviromentConfig.getenv(EnviromentConfig.BEARER_CODE);
+            String auth = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+            if (auth == null || !bearerCodeFromOS.equals(getRequestBearer(auth))) {
+                throw new NotAuthorizedException(NOT_AUTHORIZED);
+            } 
+        } else {
+            logger.error("You must configure all environment variables before running.");
+            throw new ProcessingException("You must configure all environment variables before running.");
         }
 
-        chain.doFilter(httpRequest, response);
-
     }
+
+    private String getRequestBearer(String auth) {
+        return auth.substring(auth.lastIndexOf(" ") + 1);
+    }
+
 }

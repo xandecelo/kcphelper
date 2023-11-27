@@ -11,5 +11,5 @@ import jakarta.ws.rs.NameBinding;
 @Retention(value = RetentionPolicy.RUNTIME)
 @NameBinding
 public @interface BearerRequired {
-
+    
 }

@@ -20,7 +20,6 @@ public class App {
     @BearerRequired
     @Path("private")
     public String data() {
-        logger.info("Call");
         return "Hello, private!";
     }
 }
