@@ -1,4 +1,5 @@
 .gradle
 .vscode
+test.db
 app/build
 app/bin
