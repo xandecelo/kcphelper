@@ -15,5 +15,5 @@ plugins {
 }
 
 rootProject.name = 'kcphelper'
-include('app')
+include('kcphelper')
 

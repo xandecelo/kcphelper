@@ -1,5 +1,5 @@
-.gradle
-.vscode
+**/.gradle
+**/.vscode
 test.db
-app/build
-app/bin
+app/kcphelper/build
+app/kcphelper/bin
