@@ -19,4 +19,5 @@ EOF
 }
 
 create_test_db
-./gradlew --console=plain quarkusDev
+./gradlew --console=plain quarkusDev -Dquarkus.http.host=0.0.0.0
+# -DdebugHost=0.0.0.0 dont work
